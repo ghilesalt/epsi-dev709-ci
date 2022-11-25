@@ -1,0 +1,63 @@
+pipeline {
+    agent any
+    
+    
+triggers {
+  pollSCM 'H/5 * * * *'
+}
+
+    stages {
+        
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/ghilesalt/epsi-dev709-ci.git'
+            }
+        }
+        
+        stage('Clean') {
+            steps {
+              
+                    sh '''chmod u+x ./mvnw
+                    ./mvnw clean'''
+                
+            }
+        }
+        stage('Compile') {
+            steps {
+              
+                    sh '''chmod u+x ./mvnw
+                    ./mvnw compile'''
+                    
+                
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                    
+                    sh '''chmod u+x ./mvnw
+                    ./mvnw test'''
+                    
+                
+            }
+        }
+        
+        stage('Package') {
+            steps {
+                    
+                    sh '''chmod u+x ./mvnw
+                    ./mvnw package'''
+                
+            }
+        }
+        
+        stage('Archive') {
+            steps {
+                    sh 'mv target/erphrense-0.0.1-SNAPSHOT.jar target/erphrense-$BUILD_NUMBER.jar'
+                    
+                    archiveArtifacts artifacts: 'erphrense-*.jar', followSymlinks: false
+                
+            }
+        }
+    }
+}
